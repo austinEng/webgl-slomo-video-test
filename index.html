@@ -14,8 +14,10 @@
             let copyVideo = false;
 
             let started = false;
+            let startTime = 0;
             video.addEventListener('playing', () => {
                 if (!started) {
+                    startTime = Date.now();
                     console.time('video playtime');
                 }
                 started = true;
@@ -114,6 +116,9 @@
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.uniform1i(samplerUniform, 0);
 
+            const displayText = document.createElement('pre');
+            document.body.appendChild(displayText);
+
             function frame(now) {
                 if (copyVideo) {
                     gl.texImage2D(gl.TEXTURE_2D,
@@ -123,6 +128,9 @@
                         gl.UNSIGNED_BYTE, // srcType
                         video);
                 }
+                const realTime = (Date.now() - startTime) / 1000;
+                const videoTime = video.currentTime;
+                displayText.innerHTML = `Real time: ${realTime}\nVideo time: ${videoTime}\nDrift: ${realTime - videoTime}`;
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
                 requestAnimationFrame(frame);
             }
